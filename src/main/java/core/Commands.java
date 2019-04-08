@@ -8,22 +8,13 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Random;
-
-import core.AxlsBot.*;
-
-import static core.AxlsBot.ChessFigs.*;
-import static core.AxlsBot.getFigure;
 
 public class Commands extends ListenerAdapter {
 
@@ -206,79 +197,8 @@ public class Commands extends ListenerAdapter {
             break;
 
             case "chess": {
-                final int width = 800, height = 800, tw = width / 8, th = height / 8;
-                BufferedImage field = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-                Graphics2D img = field.createGraphics();
-
-                img.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
-
-                // chess field
-                img.setColor(new Color(30, 30, 30));
-                img.fillRect(0, 0, width, height);
-                img.setColor(Color.WHITE);
-
-                for (int i = 0; i < 64; i += 2)
-                    img.fillRoundRect(tw * ((i + i / 8) % 8), th * (i / 8), tw, th, 10, 10);
-
-
-                // figs
-
-                Figure figures[] = {
-                    new Figure(Rook, BLACK, 0, 7, true),
-                    new Figure(Knight, BLACK, 1, 7, true),
-                    new Figure(Bishop, BLACK, 2, 7, true),
-                    new Figure(King, BLACK, 3, 7, true),
-                    new Figure(Queen, BLACK, 4, 7, true),
-                    new Figure(Bishop, BLACK, 5, 7, true),
-                    new Figure(Knight, BLACK, 6, 7, true),
-                    new Figure(Rook, BLACK, 7, 7, true),
-
-                    new Figure(Pawn, BLACK, 0, 6, true),
-                    new Figure(Pawn, BLACK, 1, 6, true),
-                    new Figure(Pawn, BLACK, 2, 6, true),
-                    new Figure(Pawn, BLACK, 3, 6, true),
-                    new Figure(Pawn, BLACK, 4, 6, true),
-                    new Figure(Pawn, BLACK, 5, 6, true),
-                    new Figure(Pawn, BLACK, 6, 6, true),
-                    new Figure(Pawn, BLACK, 7, 6, true),
-
-                    new Figure(Rook, WHITE, 0, 0, true),
-                    new Figure(Knight, WHITE, 1, 0, true),
-                    new Figure(Bishop, WHITE, 2, 0, true),
-                    new Figure(King, WHITE, 3, 0, true),
-                    new Figure(Queen, WHITE, 4, 0, true),
-                    new Figure(Bishop, WHITE, 5, 0, true),
-                    new Figure(Knight, WHITE, 6, 0, true),
-                    new Figure(Rook, WHITE, 7, 0, true),
-
-                    new Figure(Pawn, WHITE, 0, 1, true),
-                    new Figure(Pawn, WHITE, 1, 1, true),
-                    new Figure(Pawn, WHITE, 2, 1, true),
-                    new Figure(Pawn, WHITE, 3, 1, true),
-                    new Figure(Pawn, WHITE, 4, 1, true),
-                    new Figure(Pawn, WHITE, 5, 1, true),
-                    new Figure(Pawn, WHITE, 6, 1, true),
-                    new Figure(Pawn, WHITE, 7, 1, true),
-                };
-
-                img.setColor(new Color(0x0000000, true));
-
-                for (Figure f : figures)
-                    if (f.alive)
-                        img.drawImage(getFigure(f.figure, f.color), f.x * tw, f.y * th, tw, th, null);
-
-
-                File file = new File("field.png");
-                try {
-                    ImageIO.write(field, "png", file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-
-                event.getChannel().sendFile(file).queue();
+                new Games.Chess(event).start();
             }
-
         }
     }
 }
