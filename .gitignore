@@ -27,6 +27,3 @@ hs_err_pid*
 
 # build folder
 target
-
-# secrets
-SECRETS.java

@@ -20,21 +20,17 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Random;
 
+import core.AxlsBot.*;
+
+import static core.AxlsBot.ChessFigs.*;
+import static core.AxlsBot.getFigure;
+
 public class Commands extends ListenerAdapter {
 
-    public enum Links {
-        nobot("https://media.discordapp.net/attachments/327718257270194180/564498209825751040/Screenshot_from_2019-04-07_19-13-44.png"),
-        cookie("https://previews.123rf.com/images/memoangeles/memoangeles1506/memoangeles150600002/40818650-chocolate-chip-cookie-vektor-clipart-illustration-mit-einfachen-farbverl%C3%A4ufen-alle-in-einer-einzigen-s.jpg");
-
-        private String url;
-
-        Links(String envUrl) {
-            this.url = envUrl;
-        }
-
-        public String getUrl() {
-            return url;
-        }
+    public class Links {
+        static final String
+            nobot = "https://media.discordapp.net/attachments/327718257270194180/564498209825751040/Screenshot_from_2019-04-07_19-13-44.png",
+            cookie = "https://previews.123rf.com/images/memoangeles/memoangeles1506/memoangeles150600002/40818650-chocolate-chip-cookie-vektor-clipart-illustration-mit-einfachen-farbverl%C3%A4ufen-alle-in-einer-einzigen-s.jpg";
     }
 
     @Override
@@ -154,7 +150,7 @@ public class Commands extends ListenerAdapter {
 
             case "cookie": {
                 EmbedBuilder info = new EmbedBuilder();
-                info.setImage(Links.cookie.getUrl());
+                info.setImage(Links.cookie);
                 event.getChannel().sendMessage(info.build()).queue();
                 info.clear();
             }
@@ -162,7 +158,7 @@ public class Commands extends ListenerAdapter {
 
             case "imnobot": {
                 EmbedBuilder info = new EmbedBuilder();
-                info.setImage(Links.nobot.getUrl());
+                info.setImage(Links.nobot);
                 event.getChannel().sendMessage(info.build()).queue();
                 info.clear();
             }
@@ -206,29 +202,83 @@ public class Commands extends ListenerAdapter {
                 event.getChannel().sendMessage(
                     event.getAuthor().getAsTag() + ": " +
                         text.toString().replace(":grey_question::grey_exclamation:", ":interrobang:")).queue();
-            } break;
+            }
+            break;
 
             case "chess": {
                 final int width = 800, height = 800, tw = width / 8, th = height / 8;
-                BufferedImage bmp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-                Graphics img = bmp.getGraphics();
+                BufferedImage field = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                Graphics2D img = field.createGraphics();
 
+                img.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
+
+                // chess field
                 img.setColor(new Color(30, 30, 30));
                 img.fillRect(0, 0, width, height);
                 img.setColor(Color.WHITE);
 
-                for(int i = 0; i < 64; i += 2)
-                    img.fillRect(tw * ((i + i / 8) % 8), th * (i / 8), tw, th);
+                for (int i = 0; i < 64; i += 2)
+                    img.fillRoundRect(tw * ((i + i / 8) % 8), th * (i / 8), tw, th, 10, 10);
+
+
+                // figs
+
+                Figure figures[] = {
+                    new Figure(Rook, BLACK, 0, 7, true),
+                    new Figure(Knight, BLACK, 1, 7, true),
+                    new Figure(Bishop, BLACK, 2, 7, true),
+                    new Figure(King, BLACK, 3, 7, true),
+                    new Figure(Queen, BLACK, 4, 7, true),
+                    new Figure(Bishop, BLACK, 5, 7, true),
+                    new Figure(Knight, BLACK, 6, 7, true),
+                    new Figure(Rook, BLACK, 7, 7, true),
+
+                    new Figure(Pawn, BLACK, 0, 6, true),
+                    new Figure(Pawn, BLACK, 1, 6, true),
+                    new Figure(Pawn, BLACK, 2, 6, true),
+                    new Figure(Pawn, BLACK, 3, 6, true),
+                    new Figure(Pawn, BLACK, 4, 6, true),
+                    new Figure(Pawn, BLACK, 5, 6, true),
+                    new Figure(Pawn, BLACK, 6, 6, true),
+                    new Figure(Pawn, BLACK, 7, 6, true),
+
+                    new Figure(Rook, WHITE, 0, 0, true),
+                    new Figure(Knight, WHITE, 1, 0, true),
+                    new Figure(Bishop, WHITE, 2, 0, true),
+                    new Figure(King, WHITE, 3, 0, true),
+                    new Figure(Queen, WHITE, 4, 0, true),
+                    new Figure(Bishop, WHITE, 5, 0, true),
+                    new Figure(Knight, WHITE, 6, 0, true),
+                    new Figure(Rook, WHITE, 7, 0, true),
+
+                    new Figure(Pawn, WHITE, 0, 1, true),
+                    new Figure(Pawn, WHITE, 1, 1, true),
+                    new Figure(Pawn, WHITE, 2, 1, true),
+                    new Figure(Pawn, WHITE, 3, 1, true),
+                    new Figure(Pawn, WHITE, 4, 1, true),
+                    new Figure(Pawn, WHITE, 5, 1, true),
+                    new Figure(Pawn, WHITE, 6, 1, true),
+                    new Figure(Pawn, WHITE, 7, 1, true),
+                };
+
+                img.setColor(new Color(0x0000000, true));
+
+                for (Figure f : figures)
+                    if (f.alive)
+                        img.drawImage(getFigure(f.figure, f.color), f.x * tw, f.y * th, tw, th, null);
+
 
                 File file = new File("field.png");
                 try {
-                    ImageIO.write(bmp, "png", file);
+                    ImageIO.write(field, "png", file);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return;
                 }
 
                 event.getChannel().sendFile(file).queue();
             }
+
         }
     }
 }
