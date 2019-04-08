@@ -2,12 +2,17 @@ package core;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -43,13 +48,32 @@ public class Commands extends ListenerAdapter {
         );
     }
 
+    @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+        super.onGuildMessageReceived(event);
+
         System.out.println(
             event.getGuild().getName() + ": " +
                 event.getAuthor().getAsTag() + " (" +
                 event.getAuthor().getId() + "): \"" +
                 event.getMessage().getContentRaw() + "\""
         );
+
+        String msg = event.getMessage().getContentRaw();
+
+        if (!msg.startsWith(AxlsBot.prefix)) return;
+
+        String[] args = msg.substring(1).split("\\s+");
+        System.out.println("Command: " + Arrays.toString(args));
+        String cmd = args[0];
+        args = Arrays.copyOfRange(args, 1, args.length);
+
+        switch (cmd) {
+            case "clear": {
+                event.getChannel().deleteMessages(event.getChannel().getHistory().retrievePast(100).complete()).queue();
+            }
+            break;
+        }
     }
 
     @Override
@@ -62,27 +86,34 @@ public class Commands extends ListenerAdapter {
 
         String[] args = msg.substring(1).split("\\s+");
         System.out.println("Command: " + Arrays.toString(args));
+        String cmd = args[0];
+        args = Arrays.copyOfRange(args, 1, args.length);
 
-        switch (args[0]) {
-            /*
+        switch (cmd) {
+
             case "info": {
                 EmbedBuilder info = new EmbedBuilder();
                 info.setTitle("📺 AxlsBot");
                 info.setDescription("Completely useless information about a useless bot called 'AxlsBot'.");
                 info.setColor(0xf45642);
                 info.setAuthor("Symbroson");
-                info.setFooter("Created by Axl", event.getMember().getUser().getAvatarUrl());
+
+                if (event.isFromType(ChannelType.TEXT))
+                    info.setFooter("Created by Axl", event.getMember().getUser().getAvatarUrl());
 
                 event.getChannel().sendTyping().queue();
                 event.getChannel().sendMessage(info.build()).queue();
                 info.clear();
-            } break;*/
+            }
+            break;
 
             case "help": {
                 event.getChannel().sendMessage(
                     "`AxlsBot Command list:\n" +
+                        "    info:    knows everything\n" +
                         "    help:    shows this help\n" +
                         "    dice:    rolls a dice\n" +
+                        "    emo:     applies a regional flair to your message\n" +
                         "    funfact: tells you something you've always wanted to know\n" +
                         "    cookie:  in case you're hungry\n" +
                         "    imnobot: proves that AxlsBot is no robot\n" +
@@ -151,7 +182,52 @@ public class Commands extends ListenerAdapter {
 
             case util.SECRETS.CHACTIVITY: {
                 if (args.length > 1)
-                    core.AxlsBot.jda.getPresence().setActivity(Activity.playing(String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
+                    core.AxlsBot.jda.getPresence().setActivity(Activity.playing(String.join(" ", args)));
+            }
+
+            case "emo": {
+                final String[] nums = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+                StringBuilder text = new StringBuilder();
+
+                for (char c : String.join(" ", args).toLowerCase().toCharArray()) {
+                    if (Character.isDigit(c)) text.append(":").append(nums[c - '0']).append(":");
+                    else if (Character.isLetter(c)) text.append(":regional_indicator_").append(c).append(":");
+                    else if (c == ' ') text.append("       ");
+                    else if (c == '\t') text.append("                            ");
+                    else if (c == '?') text.append(":grey_question:");
+                    else if (c == '!') text.append(":grey_exclamation:");
+                    else if (c == '‽') text.append(":interrobang:");
+                    else text.append(c);
+                }
+
+                if (event.isFromType(ChannelType.TEXT))
+                    event.getMessage().delete().queue();
+
+                event.getChannel().sendMessage(
+                    event.getAuthor().getAsTag() + ": " +
+                        text.toString().replace(":grey_question::grey_exclamation:", ":interrobang:")).queue();
+            } break;
+
+            case "chess": {
+                final int width = 800, height = 800, tw = width / 8, th = height / 8;
+                BufferedImage bmp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                Graphics img = bmp.getGraphics();
+
+                img.setColor(new Color(30, 30, 30));
+                img.fillRect(0, 0, width, height);
+                img.setColor(Color.WHITE);
+
+                for(int i = 0; i < 64; i += 2)
+                    img.fillRect(tw * ((i + i / 8) % 8), th * (i / 8), tw, th);
+
+                File file = new File("field.png");
+                try {
+                    ImageIO.write(bmp, "png", file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                event.getChannel().sendFile(file).queue();
             }
         }
     }
