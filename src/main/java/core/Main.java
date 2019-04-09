@@ -6,14 +6,9 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 
-import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-public class AxlsBot {
+public class Main {
     public static JDA jda;
     public static String prefix = "!";
 

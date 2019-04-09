@@ -36,64 +36,15 @@ public class Chess {
         }
     }
 
-
-    // return sprite
-    private static BufferedImage getFigure(int figure) {
-        final int fw = bufFigs.getWidth() / 6, fh = bufFigs.getHeight() / 2;
-
-        if (!sprites.containsKey(figure))
-            sprites.put(figure, bufFigs.getSubimage((figure % 10) * fw, (figure / 10) * fh, fw, fh));
-        return sprites.get(figure);
-    }
-
-    // figure container
-    private static class Figure {
-        BufferedImage img;
-        boolean alive;
-        int x, y;
-
-        Figure(int figure, int color, int x, int y, boolean alive) {
-            this.img = getFigure(color + figure);
-            this.alive = alive;
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    // generate new field
-    public static void generatePlayground() {
-        final int tw = WIDTH / W, th = HEIGHT / H;
-        BufferedImage field = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-        Graphics2D img = field.createGraphics();
-
-        // chess field
-        img.setColor(new Color(30, 30, 30));
-        img.fillRect(0, 0, WIDTH, HEIGHT);
-        img.setColor(Color.WHITE);
-
-        for (int i = 0; i < W * H; i += 2)
-            img.fillRoundRect(tw * ((i + i / H) % W), th * (i / H), tw, th, 10, 10);
-
-        try {
-            File file = new File(String.format("res/field%dx%d.png", WIDTH, HEIGHT));
-            ImageIO.write(field, "png", file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    // non static values
-
-    private BufferedImage buf;
-    private Graphics2D img;
-    private MessageChannel channel;
     private final Figure[] figures;
     private final String gameID = UUID.randomUUID().toString();
     private final File fileGame = new File("data/" + gameID + "/game.png");
 
 
+    // non static values
+    private BufferedImage buf;
+    private Graphics2D img;
+    private MessageChannel channel;
     // initialization code
     public Chess(MessageReceivedEvent event) {
 
@@ -144,6 +95,37 @@ public class Chess {
         };
     }
 
+    // return sprite
+    private static BufferedImage getFigure(int figure) {
+        final int fw = bufFigs.getWidth() / 6, fh = bufFigs.getHeight() / 2;
+
+        if (!sprites.containsKey(figure))
+            sprites.put(figure, bufFigs.getSubimage((figure % 10) * fw, (figure / 10) * fh, fw, fh));
+        return sprites.get(figure);
+    }
+
+    // generate new field
+    public static void generatePlayground() {
+        final int tw = WIDTH / W, th = HEIGHT / H;
+        BufferedImage field = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        Graphics2D img = field.createGraphics();
+
+        // chess field
+        img.setColor(new Color(85, 255, 76));
+        img.fillRect(0, 0, WIDTH, HEIGHT);
+        img.setColor(Color.WHITE);
+
+        for (int i = 0; i < W * H; i += 2)
+            img.fillRoundRect(tw * ((i + i / H) % W), th * (i / H), tw, th, 10, 10);
+
+        try {
+            File file = new File(String.format("res/field%dx%d.png", WIDTH, HEIGHT));
+            ImageIO.write(field, "png", file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void render() {
         final int tw = WIDTH / W, th = HEIGHT / H;
 
@@ -176,5 +158,19 @@ public class Chess {
     public void onCommand(String[] command, MessageReceivedEvent event) {
         String cmd = command[0];
         String[] args = Arrays.copyOfRange(command, 1, command.length);
+    }
+
+    // figure container
+    private static class Figure {
+        BufferedImage img;
+        boolean alive;
+        int x, y;
+
+        Figure(int figure, int color, int x, int y, boolean alive) {
+            this.img = getFigure(color + figure);
+            this.alive = alive;
+            this.x = x;
+            this.y = y;
+        }
     }
 }

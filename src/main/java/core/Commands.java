@@ -18,12 +18,6 @@ import java.util.Random;
 
 public class Commands extends ListenerAdapter {
 
-    public class Links {
-        static final String
-            nobot = "https://media.discordapp.net/attachments/327718257270194180/564498209825751040/Screenshot_from_2019-04-07_19-13-44.png",
-            cookie = "https://previews.123rf.com/images/memoangeles/memoangeles1506/memoangeles150600002/40818650-chocolate-chip-cookie-vektor-clipart-illustration-mit-einfachen-farbverl%C3%A4ufen-alle-in-einer-einzigen-s.jpg";
-    }
-
     @Override
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
         super.onPrivateMessageReceived(event);
@@ -48,7 +42,7 @@ public class Commands extends ListenerAdapter {
 
         String msg = event.getMessage().getContentRaw();
 
-        if (!msg.startsWith(AxlsBot.prefix)) return;
+        if (!msg.startsWith(Main.prefix)) return;
 
         String[] args = msg.substring(1).split("\\s+");
         System.out.println("Command: " + Arrays.toString(args));
@@ -69,7 +63,7 @@ public class Commands extends ListenerAdapter {
 
         String msg = event.getMessage().getContentRaw();
 
-        if (!msg.startsWith(AxlsBot.prefix)) return;
+        if (!msg.startsWith(Main.prefix)) return;
 
         String[] args = msg.substring(1).split("\\s+");
         System.out.println("Command: " + Arrays.toString(args));
@@ -169,7 +163,7 @@ public class Commands extends ListenerAdapter {
 
             case util.SECRETS.CHACTIVITY: {
                 if (args.length > 1)
-                    core.AxlsBot.jda.getPresence().setActivity(Activity.playing(String.join(" ", args)));
+                    Main.jda.getPresence().setActivity(Activity.playing(String.join(" ", args)));
             }
 
             case "emo": {
@@ -203,5 +197,11 @@ public class Commands extends ListenerAdapter {
                 game.stop();
             }
         }
+    }
+
+    public class Links {
+        static final String
+            nobot = "https://media.discordapp.net/attachments/327718257270194180/564498209825751040/Screenshot_from_2019-04-07_19-13-44.png",
+            cookie = "https://previews.123rf.com/images/memoangeles/memoangeles1506/memoangeles150600002/40818650-chocolate-chip-cookie-vektor-clipart-illustration-mit-einfachen-farbverl%C3%A4ufen-alle-in-einer-einzigen-s.jpg";
     }
 }
