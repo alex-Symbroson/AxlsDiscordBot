@@ -1,10 +1,12 @@
 package Games;
 
+import core.Main;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.io.FileUtils;
 
-import javax.imageio.ImageIO;
+import javax.imageio.*;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -19,36 +21,40 @@ public class Chess {
     // static values
 
     // constants
-    private static final int WIDTH = 800, HEIGHT = 800, W = 8, H = 8;
-    private static final int KING = 0, QUEEN = 1, BISHOP = 2, KNIGHT = 3, ROOK = 4, PAWN = 5;
     private static final int WHITE = 0, BLACK = 10;
+    private static final int WIDTH = 400, HEIGHT = 400, W = 8, H = 8;
+    private static final int KING = 0, QUEEN = 1, BISHOP = 2, KNIGHT = 3, ROOK = 4, PAWN = 5;
+    private static final File fileField = new File(String.format("res/field%dx%d.png", WIDTH, HEIGHT));
 
     // resources
     private static BufferedImage bufFigs, bufField;
     private static Map<Integer, BufferedImage> sprites = new HashMap<Integer, BufferedImage>() {};
-
-    static {
-        try {
-            bufFigs = ImageIO.read(new File("res/chessfigs_600x200.png"));
-            bufField = ImageIO.read(new File(String.format("res/field%dx%d.png", WIDTH, HEIGHT)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private final Figure[] figures;
     private final String gameID = UUID.randomUUID().toString();
     private final File fileGame = new File("data/" + gameID + "/game.png");
 
 
+    static {
+        try {
+            bufFigs = ImageIO.read(new File("res/chessfigs_600x200.png"));
+            if(!fileField.exists()) generatePlayground();
+            bufField = ImageIO.read(fileField);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     // non static values
     private BufferedImage buf;
     private Graphics2D img;
     private MessageChannel channel;
+
     // initialization code
     public Chess(MessageReceivedEvent event) {
 
-        fileGame.mkdirs();
+        fileGame.getParentFile().mkdirs();
         channel = event.getChannel();
 
         // init drawing buffer
@@ -111,20 +117,17 @@ public class Chess {
         Graphics2D img = field.createGraphics();
 
         // chess field
-        img.setColor(new Color(85, 255, 76));
+        img.setColor(new Color(30, 30, 30));
         img.fillRect(0, 0, WIDTH, HEIGHT);
         img.setColor(Color.WHITE);
 
         for (int i = 0; i < W * H; i += 2)
             img.fillRoundRect(tw * ((i + i / H) % W), th * (i / H), tw, th, 10, 10);
 
-        try {
-            File file = new File(String.format("res/field%dx%d.png", WIDTH, HEIGHT));
-            ImageIO.write(field, "png", file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // ImageIO.write(field, "png", fileField);
+        Main.saveCompressed(field, "png", fileField);
     }
+
 
     private void render() {
         final int tw = WIDTH / W, th = HEIGHT / H;
@@ -135,11 +138,7 @@ public class Chess {
             if (f.alive)
                 img.drawImage(f.img, f.x * tw, f.y * th, tw, th, null);
 
-        try {
-            ImageIO.write(buf, "png", fileGame);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Main.saveCompressed(buf, "png", fileGame);
     }
 
     public void start() {

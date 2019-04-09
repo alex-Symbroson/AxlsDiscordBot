@@ -1,12 +1,17 @@
 package core;
 
+import Games.Chess;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 
+import javax.imageio.*;
 import javax.security.auth.login.LoginException;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
     public static JDA jda;
@@ -20,5 +25,25 @@ public class Main {
         jda.getPresence().setStatus(OnlineStatus.ONLINE);
 
         jda.addEventListener(new Commands());
+    }
+
+    public static void saveCompressed(BufferedImage img, String fmt, File fil){
+
+        try {
+            ImageTypeSpecifier type = ImageTypeSpecifier.createFromRenderedImage(img);
+            ImageWriter writer = ImageIO.getImageWriters(type, fmt).next();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+
+            if (param.canWriteCompressed()) {
+                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                param.setCompressionQuality(0.0f);
+            }
+
+            writer.setOutput(ImageIO.createImageOutputStream(fil));
+            writer.write(null, new IIOImage(img, null, null), param);
+            writer.dispose();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
