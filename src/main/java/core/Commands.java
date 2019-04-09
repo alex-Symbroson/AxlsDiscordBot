@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -28,6 +27,28 @@ public class Commands extends ListenerAdapter {
                 event.getAuthor().getId() + "): \"" +
                 event.getMessage().getContentRaw() + "\""
         );
+
+        String msg = event.getMessage().getContentRaw();
+
+        String[] args = msg.split("\\s+");
+        if (!args[0].equalsIgnoreCase(Main.prefix)) return;
+
+        String cmd = args[1];
+        args = Arrays.copyOfRange(args, 2, args.length);
+
+        switch (cmd) {
+            case "spam": {
+                for (int i = 0; i < 10; i++) {
+                    event.getChannel().sendMessage("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.").queue();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            break;
+        }
     }
 
     @Override
@@ -43,18 +64,35 @@ public class Commands extends ListenerAdapter {
 
         String msg = event.getMessage().getContentRaw();
 
-        if (!msg.startsWith(Main.prefix)) return;
+        String[] args = msg.split("\\s+");
+        if (!args[0].equalsIgnoreCase(Main.prefix)) return;
 
-        String[] args = msg.substring(1).split("\\s+");
-        System.out.println("Command: " + Arrays.toString(args));
-        String cmd = args[0];
-        args = Arrays.copyOfRange(args, 1, args.length);
+        String cmd = args[1];
+        args = Arrays.copyOfRange(args, 2, args.length);
 
         switch (cmd) {
             case "clear": {
                 event.getChannel().deleteMessages(event.getChannel().getHistory().retrievePast(100).complete()).queue();
             }
             break;
+
+            case "spam": {
+                if (!event.getAuthor().getName().equals("Symbroson")) {
+                    event.getChannel().sendMessage("You suck " + event.getAuthor().getName() + "!").queue();
+                    return;
+                }
+
+                for (int i = 0; i < 10; i++) {
+                    event.getChannel().sendMessage("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.").queue();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            break;
+
         }
     }
 
@@ -65,7 +103,7 @@ public class Commands extends ListenerAdapter {
         String msg = event.getMessage().getContentRaw();
 
         String[] args = msg.split("\\s+");
-        if(!args[0].equalsIgnoreCase(Main.prefix)) return;
+        if (!args[0].equalsIgnoreCase(Main.prefix)) return;
         System.out.println("Command: " + Arrays.toString(args));
 
         String cmd = args[1];
@@ -92,17 +130,19 @@ public class Commands extends ListenerAdapter {
             case "help": {
                 event.getChannel().sendMessage(
                     "**AxlsBot Command list**\n" +
-                        "*command prefix: " + Main.prefix + "*\n`" +
-                        "    info:    knows everything\n" +
-                        "    help:    shows this help\n" +
-                        "    dice:    rolls a dice\n" +
-                        "    emo:     applies a regional flair to your message\n" +
-                        "    funfact: tells you something you've always wanted to know\n" +
-                        "    cookie:  in case you're hungry\n" +
-                        "    chess:   shows a fancy chess game\n" +
-                        "    imnobot: proves that AxlsBot is no robot\n" +
-                        "    spam:    dont!\n\n" +
-                        "Thanks for using AxlsBot`"
+                        "*command prefix: " + Main.prefix + "*\n\n" +
+                        "**info**: knows everything\n" +
+                        "**help**: shows this help\n" +
+                        "**dice**: rolls a dice\n" +
+                        "**emo** *text*: applies a regional flair to your message\n" +
+                        "**funfact**: tells you something you've always wanted to know\n" +
+                        "**cookie**: in case you're hungry\n" +
+                        "**chess**: shows a fancy chess game\n" +
+                        "**imnobot**: proves that AxlsBot is no robot\n" +
+                        "**spam**: dont!\n" +
+                        "**encrypt** *__method__* *key* *text*: encrypt message using\n" +
+                        "    ***caesar*** *char* *text*\n\n" +
+                        "Thanks for using AxlsBot"
                 ).queue();
             }
             break;
@@ -152,23 +192,6 @@ public class Commands extends ListenerAdapter {
             }
             break;
 
-            case "spam": {
-                if(!event.getAuthor().getName().equals("Symbroson")) {
-                    event.getChannel().sendMessage("You suck " + event.getAuthor().getName() + "!").queue();
-                    return;
-                }
-
-                for (int i = 0; i < 10; i++) {
-                    event.getChannel().sendMessage("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.").queue();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            break;
-
             case util.SECRETS.CHACTIVITY: {
                 if (args.length > 1)
                     Main.jda.getPresence().setActivity(Activity.playing(String.join(" ", args)));
@@ -203,9 +226,66 @@ public class Commands extends ListenerAdapter {
                 Games.Chess game = new Games.Chess(event);
                 game.start();
                 game.stop();
+            }
+            break;
+
+            case "encrypt": {
+                final String dec = "abcdefghijklmnopqrstuvwxyz";
+
+                switch (args[0].toLowerCase()) {
+                    case "caesar": {
+                        System.out.println(Arrays.toString(args));
+                        int key = args[1].charAt(0);
+                        if (Character.isLetter(key)) key = Character.toLowerCase(key) - 'a';
+                        else if (Character.isDigit(key)) key -= '0';
+
+                        StringBuilder enc = new StringBuilder();
+                        for (char c : String.join(" ", Arrays.copyOfRange(args, 2, args.length)).toCharArray()) {
+                            int p = dec.indexOf(Character.toLowerCase(c));
+                            char nc = c;
+                            if (p != -1) {
+                                nc = dec.charAt((p + key + dec.length()) % dec.length());
+                                if (Character.isUpperCase(c)) nc = Character.toUpperCase(nc);
+                            }
+                            enc.append(nc);
+                        }
+                        event.getChannel().sendMessage(enc).queue();
+                    }
+                    break;
+                }
             } break;
 
-            case "clear": break; // guild
+            case "decrypt": {
+                final String dec = "abcdefghijklmnopqrstuvwxyz";
+
+                switch (args[0].toLowerCase()) {
+                    case "caesar": {
+                        System.out.println(Arrays.toString(args));
+                        int key = args[1].charAt(0);
+                        if (Character.isLetter(key)) key = Character.toLowerCase(key) - 'a';
+                        else if (Character.isDigit(key)) key -= '0';
+
+                        StringBuilder enc = new StringBuilder();
+                        for (char c : String.join(" ", Arrays.copyOfRange(args, 2, args.length)).toCharArray()) {
+                            int p = dec.indexOf(Character.toLowerCase(c));
+                            char nc = c;
+                            if (p != -1) {
+                                nc = dec.charAt((p - key + dec.length()) % dec.length());
+                                if (Character.isUpperCase(c)) nc = Character.toUpperCase(nc);
+                            }
+                            enc.append(nc);
+                        }
+                        event.getChannel().sendMessage(enc).queue();
+                    }
+                    break;
+                }
+            } break;
+
+            // commands handled elsewhere
+            case "clear":
+                break;
+            case "spam":
+                break;
 
             default:
                 event.getChannel().sendMessage("AxlsBot doesn't know '" + cmd + "'! He's too stupid for that.").queue();
