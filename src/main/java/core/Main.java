@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class Main {
     public static JDA jda;
-    public static String prefix = "!";
+    public static String prefix = "axl";
 
     // Main method
     public static void main(String[] args) throws LoginException {

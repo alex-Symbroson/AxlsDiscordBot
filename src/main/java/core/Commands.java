@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -63,12 +64,12 @@ public class Commands extends ListenerAdapter {
 
         String msg = event.getMessage().getContentRaw();
 
-        if (!msg.startsWith(Main.prefix)) return;
-
-        String[] args = msg.substring(1).split("\\s+");
+        String[] args = msg.split("\\s+");
+        if(!args[0].equalsIgnoreCase(Main.prefix)) return;
         System.out.println("Command: " + Arrays.toString(args));
-        String cmd = args[0];
-        args = Arrays.copyOfRange(args, 1, args.length);
+
+        String cmd = args[1];
+        args = Arrays.copyOfRange(args, 2, args.length);
 
         switch (cmd) {
 
@@ -90,13 +91,15 @@ public class Commands extends ListenerAdapter {
 
             case "help": {
                 event.getChannel().sendMessage(
-                    "`AxlsBot Command list:\n" +
+                    "**AxlsBot Command list**\n" +
+                        "*command prefix: " + Main.prefix + "*\n`" +
                         "    info:    knows everything\n" +
                         "    help:    shows this help\n" +
                         "    dice:    rolls a dice\n" +
                         "    emo:     applies a regional flair to your message\n" +
                         "    funfact: tells you something you've always wanted to know\n" +
                         "    cookie:  in case you're hungry\n" +
+                        "    chess:   shows a fancy chess game\n" +
                         "    imnobot: proves that AxlsBot is no robot\n" +
                         "    spam:    dont!\n\n" +
                         "Thanks for using AxlsBot`"
@@ -143,14 +146,19 @@ public class Commands extends ListenerAdapter {
 
             case "imnobot": {
                 EmbedBuilder info = new EmbedBuilder();
-                info.setImage(Links.nobot);
+                info.setImage("https://raw.githubusercontent.com/alex-Symbroson/AxlsDiscordBot/master/res/nobot.png");
                 event.getChannel().sendMessage(info.build()).queue();
                 info.clear();
             }
             break;
 
             case "spam": {
-                for (int i = 0; i < 200; i++) {
+                if(!event.getAuthor().getName().equals("Symbroson")) {
+                    event.getChannel().sendMessage("You suck " + event.getAuthor().getName() + "!").queue();
+                    return;
+                }
+
+                for (int i = 0; i < 10; i++) {
                     event.getChannel().sendMessage("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.").queue();
                     try {
                         Thread.sleep(1000);
@@ -195,13 +203,17 @@ public class Commands extends ListenerAdapter {
                 Games.Chess game = new Games.Chess(event);
                 game.start();
                 game.stop();
-            }
+            } break;
+
+            case "clear": break; // guild
+
+            default:
+                event.getChannel().sendMessage("AxlsBot doesn't know '" + cmd + "'! He's too stupid for that.").queue();
         }
     }
 
     public class Links {
         static final String
-            nobot = "https://media.discordapp.net/attachments/327718257270194180/564498209825751040/Screenshot_from_2019-04-07_19-13-44.png",
             cookie = "https://previews.123rf.com/images/memoangeles/memoangeles1506/memoangeles150600002/40818650-chocolate-chip-cookie-vektor-clipart-illustration-mit-einfachen-farbverl%C3%A4ufen-alle-in-einer-einzigen-s.jpg";
     }
 }
