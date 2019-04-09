@@ -2,6 +2,7 @@ package Games;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apache.commons.io.FileUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -28,8 +29,8 @@ public class Chess {
 
     static {
         try {
-            bufFigs = ImageIO.read(new File("chessfigs_600x200.png"));
-            bufField = ImageIO.read(new File(String.format("field%dx%d.png", WIDTH, HEIGHT)));
+            bufFigs = ImageIO.read(new File("res/chessfigs_600x200.png"));
+            bufField = ImageIO.read(new File(String.format("res/field%dx%d.png", WIDTH, HEIGHT)));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,8 +66,6 @@ public class Chess {
         BufferedImage field = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         Graphics2D img = field.createGraphics();
 
-        // img.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
-
         // chess field
         img.setColor(new Color(30, 30, 30));
         img.fillRect(0, 0, WIDTH, HEIGHT);
@@ -76,7 +75,7 @@ public class Chess {
             img.fillRoundRect(tw * ((i + i / H) % W), th * (i / H), tw, th, 10, 10);
 
         try {
-            File file = new File(String.format("field%dx%d.png", WIDTH, HEIGHT));
+            File file = new File(String.format("res/field%dx%d.png", WIDTH, HEIGHT));
             ImageIO.write(field, "png", file);
         } catch (IOException e) {
             e.printStackTrace();
@@ -92,12 +91,13 @@ public class Chess {
     private MessageChannel channel;
     private final Figure[] figures;
     private final String gameID = UUID.randomUUID().toString();
-    private final File fileGame = new File("chess_" + gameID + ".png");
+    private final File fileGame = new File("data/" + gameID + "/game.png");
 
 
     // initialization code
     public Chess(MessageReceivedEvent event) {
 
+        fileGame.mkdirs();
         channel = event.getChannel();
 
         // init drawing buffer
@@ -163,6 +163,14 @@ public class Chess {
     public void start() {
         render();
         channel.sendFile(fileGame).queue();
+    }
+
+    public void stop() {
+        try {
+            FileUtils.deleteDirectory(new File("data/" + gameID));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onCommand(String[] command, MessageReceivedEvent event) {

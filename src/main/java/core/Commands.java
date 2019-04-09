@@ -197,7 +197,10 @@ public class Commands extends ListenerAdapter {
             break;
 
             case "chess": {
-                new Games.Chess(event).start();
+                Games.Chess.generatePlayground();
+                Games.Chess game = new Games.Chess(event);
+                game.start();
+                game.stop();
             }
         }
     }
