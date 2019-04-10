@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Random;
 
 public class Commands extends ListenerAdapter {
@@ -23,9 +24,11 @@ public class Commands extends ListenerAdapter {
         super.onPrivateMessageReceived(event);
 
         System.out.println(
-            event.getAuthor().getAsTag() + " (" +
-                event.getAuthor().getId() + "): \"" +
-                event.getMessage().getContentRaw() + "\""
+            "\033[0;2m" + Main.dateFormat.format(new Date()) +
+                "\033[1;30mPrivate\033[2;90m::\033[0;2m" +
+                event.getAuthor().getAsTag() + "\033[2;90m(\033[3;2m" +
+                event.getAuthor().getId() + "\033[2;90m)\033[0;37m: " +
+                event.getMessage().getContentRaw()
         );
 
         String msg = event.getMessage().getContentRaw();
@@ -56,10 +59,14 @@ public class Commands extends ListenerAdapter {
         super.onGuildMessageReceived(event);
 
         System.out.println(
-            event.getGuild().getName() + ": " +
-                event.getAuthor().getAsTag() + " (" +
-                event.getAuthor().getId() + "): \"" +
-                event.getMessage().getContentRaw() + "\""
+            "\033[0;2m" + Main.dateFormat.format(new Date()) +
+                event.getGuild().getName() + "\033[2;90m(\033[3;2m" +
+                event.getGuild().getId() + "\033[2;90m)::\033[0;2m" +
+                event.getChannel().getName() + "\033[2;90m(\033[3;2m" +
+                event.getChannel().getId() + "\033[2;90m)::\033[0;2m" +
+                event.getAuthor().getAsTag() + "\033[2;90m(\033[3;2m" +
+                event.getAuthor().getId() + "\033[2;90m)\033[0;37m: " +
+                event.getMessage().getContentRaw()
         );
 
         String msg = event.getMessage().getContentRaw();
@@ -92,7 +99,6 @@ public class Commands extends ListenerAdapter {
                 }
             }
             break;
-
         }
     }
 
@@ -108,6 +114,8 @@ public class Commands extends ListenerAdapter {
 
         String cmd = args[1];
         args = Arrays.copyOfRange(args, 2, args.length);
+
+        event.getChannel().sendTyping().complete();
 
         switch (cmd) {
 
@@ -147,6 +155,7 @@ public class Commands extends ListenerAdapter {
             }
             break;
 
+            case "roll":
             case "dice": {
                 int roll = new Random().nextInt(6) + 1;
                 event.getChannel().sendMessage(event.getAuthor().getName() + "'s roll: " + roll).queue();
@@ -253,7 +262,8 @@ public class Commands extends ListenerAdapter {
                     }
                     break;
                 }
-            } break;
+            }
+            break;
 
             case "decrypt": {
                 final String dec = "abcdefghijklmnopqrstuvwxyz";
@@ -279,7 +289,8 @@ public class Commands extends ListenerAdapter {
                     }
                     break;
                 }
-            } break;
+            }
+            break;
 
             // commands handled elsewhere
             case "clear":
