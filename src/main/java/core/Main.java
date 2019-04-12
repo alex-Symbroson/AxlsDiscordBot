@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 
-import javax.imageio.*;
+import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -22,29 +22,33 @@ public class Main {
     public static void main(String[] args) throws LoginException {
 
         jda = new JDABuilder(AccountType.BOT).setToken(util.SECRETS.TOKEN).build();
-        //jda.getPresence().setStatus(OnlineStatus.IDLE);
-        jda.getPresence().setActivity(Activity.playing("nichts. Langweiler."));
+        jda.getPresence().setActivity(Activity.playing("Nichts. Langweiler."));
         jda.getPresence().setStatus(OnlineStatus.ONLINE);
         jda.setAutoReconnect(true);
         jda.addEventListener(new Commands());
     }
 
-    public static void saveCompressed(BufferedImage img, String fmt, File fil){
+    private static long tStart = 0, tStep = 0, tDiff = 0;
+
+    public static void tic() {
+        tStart = tStep = System.nanoTime();
+    }
+
+    public static void toc() {
+        long t = System.nanoTime();
+        tDiff = t - tStep;
+        System.out.println(String.format("dtime: %dus", tDiff / 1000));
+        tStep = t;
+    }
+
+    public static void saveCompressed(BufferedImage img, File fil) {
 
         try {
-            ImageTypeSpecifier type = ImageTypeSpecifier.createFromRenderedImage(img);
-            ImageWriter writer = ImageIO.getImageWriters(type, fmt).next();
-            ImageWriteParam param = writer.getDefaultWriteParam();
-
-            if (param.canWriteCompressed()) {
-                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                param.setCompressionQuality(0.0f);
-            }
-
-            writer.setOutput(ImageIO.createImageOutputStream(fil));
-            writer.write(null, new IIOImage(img, null, null), param);
-            writer.dispose();
-        } catch (IOException e) {
+            String path = fil.getPath();
+            ImageIO.write(img, "bmp", new File(path + ".bmp"));
+            Process p = Runtime.getRuntime().exec("convert " + path + ".bmp " + path);
+            p.waitFor();
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

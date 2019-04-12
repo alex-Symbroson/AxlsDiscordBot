@@ -124,8 +124,7 @@ public class Chess {
         for (int i = 0; i < W * H; i += 2)
             img.fillRoundRect(tw * ((i + i / H) % W), th * (i / H), tw, th, 10, 10);
 
-        // ImageIO.write(field, "png", fileField);
-        Main.saveCompressed(field, "png", fileField);
+        Main.saveCompressed(field, fileField);
     }
 
 
@@ -138,7 +137,7 @@ public class Chess {
             if (f.alive)
                 img.drawImage(f.img, f.x * tw, f.y * th, tw, th, null);
 
-        Main.saveCompressed(buf, "png", fileGame);
+        Main.saveCompressed(buf, fileGame);
     }
 
     public void start() {
